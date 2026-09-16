@@ -1,5 +1,29 @@
-Pokémon Showdown
+Pokémon Skirmish backend
 ========================================================================
+
+This is a fork of `smogon/pokemon-showdown` (unmodified aside from
+`config/config.js`), kept as the local dev backend for the
+[Pokémon Skirmish](https://github.com/jasoncramer/ShowdownFrontend) frontend.
+
+**Start the server:** `npm install && npm start` (runs on port 8000).
+
+**Config:** `config/config.js` is committed (normally gitignored upstream)
+with three local-dev-only settings on top of the example defaults:
+- `noguestsecurity = true` - lets a client claim a custom guest name via
+  `/trn` without a login-server-signed token. Without this, renaming away
+  from the server-assigned "Guest ####" doesn't work at all against a
+  private server, since a real signed assertion is checked against
+  `legalhosts` and would be rejected as being for the wrong server anyway.
+- `nothrottle = true` / `noipchecks = true` - a stock server limits battles
+  per IP and requires two searchers to have different IPs before
+  matchmaking pairs them. Testing locally (e.g. two browser tabs of the
+  frontend both searching `gen9randombattle`) means both connections share
+  `127.0.0.1`, so without these two settings they'd never match each other.
+
+**Staying in sync with upstream:** since this is a real GitHub fork (not a
+plain clone), `gh repo sync` or GitHub's "Sync fork" button pulls in
+`smogon/pokemon-showdown`'s changes; from the command line,
+`git fetch upstream && git merge upstream/master` does the same.
 
 Navigation: [Website][1] | **Server repository** | [Client repository][2] | [Dex repository][3]
 
