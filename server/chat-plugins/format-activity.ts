@@ -9,7 +9,7 @@
  */
 
 interface FormatActivity {
-	/** Battles in progress (each game of a best-of counts on its own). */
+	/** Battles in progress - a best-of series counts once, not once per game. */
 	battles: number;
 	/** Players currently in the ladder search queue. */
 	searching: number;
@@ -17,7 +17,10 @@ interface FormatActivity {
 
 function getFormatActivity() {
 	const activity = new Map<string, FormatActivity>();
-	const entry = (formatid: string) => {
+	// A challenge's format carries its custom rules ("gen9ou@@@Best of = 3") -
+	// count it under the format itself.
+	const entry = (format: string) => {
+		const formatid = toID(format.split('@@@')[0]);
 		let found = activity.get(formatid);
 		if (!found) {
 			found = { battles: 0, searching: 0 };
@@ -27,8 +30,14 @@ function getFormatActivity() {
 	};
 
 	for (const room of Rooms.rooms.values()) {
-		if (room.type !== 'battle' || !room.battle || room.battle.ended) continue;
-		entry(room.format).battles++;
+		if (room.type !== 'battle') continue;
+		if (room.bestOf) {
+			// The series' own room - it spans the gaps between its games.
+			if (!room.bestOf.ended) entry(room.format).battles++;
+		} else if (room.battle && !room.battle.ended && !room.parent?.bestOf) {
+			// A standalone battle - one game of a series is counted above.
+			entry(room.format).battles++;
+		}
 	}
 	for (const [formatid, formatTable] of Ladders.searches) {
 		if (formatTable.searches.size) entry(formatid).searching += formatTable.searches.size;
