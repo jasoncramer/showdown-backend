@@ -189,23 +189,23 @@ exports.crashguard = true;
  *   Don't change this setting - there aren't any other login servers right now
  */
 exports.loginserver = 'http://play.pokemonshowdown.com/';
-exports.loginserverkeyalgo = "RSA-SHA1";
+// Login tokens come from our own accounts service (the showdown-accounts repo),
+// not play.pokemonshowdown.com: this is that service's public key, from
+// `npm run keygen` there. Each server install needs its own key pair.
+exports.loginserverkeyalgo = "RSA-SHA256";
 exports.loginserverpublickeyid = 4;
 exports.loginserverpublickey = `-----BEGIN PUBLIC KEY-----
-MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAzfWKQXg2k8c92aiTyN37
-dl76iW0aeAighgzeesdar4xZT1A9yzLpj2DgR8F8rh4R32/EVOPmX7DCf0bYWeh3
-QttP0HVKKKfsncJZ9DdNtKj1vWdUTklH8oeoIZKs54dwWgnEFKzb9gxqu+z+FJoQ
-vPnvfjCRUPA84O4kqKSuZT2qiWMFMWNQPXl87v+8Atb+br/WXvZRyiLqIFSG+ySn
-Nwx6V1C8CA1lYqcPcTfmQs+2b4SzUa8Qwkr9c1tZnXlWIWj8dVvdYtlo0sZZBfAm
-X71Rsp2vwEleSFKV69jj+IzAfNHRRw+SADe3z6xONtrJOrp+uC/qnLNuuCfuOAgL
-dnUVFLX2aGH0Wb7ZkriVvarRd+3otV33A8ilNPIoPb8XyFylImYEnoviIQuv+0VW
-RMmQlQ6RMZNr6sf9pYMDhh2UjU11++8aUxBaso8zeSXC9hhp7mAa7OTxts1t3X57
-72LqtHHEzxoyLj/QDJAsIfDmUNAq0hpkiRaXb96wTh3IyfI/Lqh+XmyJuo+S5GSs
-RhlSYTL4lXnj/eOa23yaqxRihS2MT9EZ7jNd3WVWlWgExIS2kVyZhL48VA6rXDqr
-Ko0LaPAMhcfETxlFQFutoWBRcH415A/EMXJa4FqYa9oeXWABNtKkUW0zrQ194btg
-Y929lRybWEiKUr+4Yw2O1W0CAwEAAQ==
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyUQ/FfnKxX+uNpyH9OYh
+dVgsoITXMm2nVrbpGZuWEy0XiwT1FXpRe+2W5H2x1VEWbmenwEmf/uloaPtnK3tz
+Oo4poYy7k4dZuYjo5au+gmiTW9GycFdsw93CFpwtfAxLgec4o60g/2/9N1/dubO4
+/Bp6odYE5AN/59WzLW+T1VL4DNa5qxVZoe22TcZQ9xMbzcAfw8phNJYI53/Ve7nf
+mMvZ33QZTuXwgn6Ru3eFWYt8UViK+Gf2E7lwSCQakTfzUcDEj7wv0aYFdmC1+N34
+8Z0phMCA5vRemBaZH1QFaffadcugCsE0/OMf416tTeoNl9bOdRPDxKSUjQlyteZy
+3QIDAQAB
 -----END PUBLIC KEY-----
 `;
+// The hostname the accounts service signs into each token (its BATTLE_HOSTNAME).
+exports.legalhosts = ['showdown-local'];
 
 /**
  * routes - where Pokemon Showdown is hosted.
@@ -460,7 +460,7 @@ exports.autolockdown = true;
  * Logging in this way will make you considered an unregistered user and grant
  * no authority. You cannot log into a trusted (g+/r%) user account this way.
  */
-exports.noguestsecurity = true;
+exports.noguestsecurity = false;
 
 /**
  * tourroom - specify a room to receive tournament announcements (defaults to
