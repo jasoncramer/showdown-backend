@@ -3,8 +3,8 @@
  * the same validator that checks teams when a battle starts.
  *
  * `/cmd formatdata FORMAT` answers with `|queryresponse|formatdata|JSON`:
- * the format's team rules, and the species, items, abilities and moves its
- * teams can use (see FormatData).
+ * the format's team rules, and the species, items, abilities, moves and
+ * Mega Evolutions its teams can use (see FormatData).
  *
  * `/cmd formatlearnset FORMAT, SPECIES` answers with
  * `|queryresponse|formatlearnset|JSON`: the ids of the moves that species
@@ -49,6 +49,17 @@ interface FormatData {
 	/** Species a team can start as, with the abilities each can have. */
 	species: { name: string, abilities: string[] }[];
 	items: { name: string, desc: string }[];
+	/** What each legal Mega Stone turns each species that can hold it into. */
+	megas: {
+		stone: string,
+		/** The species holding it. */
+		species: string,
+		/** The Mega form it becomes. */
+		mega: string,
+		types: string[],
+		ability: string,
+		baseStats: StatsTable,
+	}[];
 	/** Every ability a species above can have (and its Mega, if it has one). */
 	abilities: { [name: string]: string };
 	moves: {
@@ -95,9 +106,21 @@ function getFormatData(validator: Validator): FormatData {
 		.filter(item => item.id && !validator.checkItem(set(''), item, {}))
 		.map(item => ({ name: item.name, desc: describe(item) }))
 		.sort((a, b) => a.name.localeCompare(b.name));
-	const megaStones = new Set(dex.items.all()
+	const megas: FormatData['megas'] = dex.items.all()
 		.filter(item => item.megaStone && items.some(({ name }) => name === item.name))
-		.flatMap(item => Object.values(item.megaStone!)));
+		.flatMap(item => Object.entries(item.megaStone!).map(([holder, megaName]) => {
+			const mega = dex.species.get(megaName);
+			return {
+				stone: item.name,
+				species: holder,
+				mega: mega.name,
+				types: [...mega.types],
+				ability: mega.abilities['0'],
+				baseStats: { ...mega.baseStats },
+			};
+		}))
+		.sort((a, b) => a.mega.localeCompare(b.mega));
+	const megaStones = new Set(megas.map(({ mega }) => mega));
 
 	const abilities: { [name: string]: string } = {};
 	const species: FormatData['species'] = [];
@@ -156,6 +179,7 @@ function getFormatData(validator: Validator): FormatData {
 		},
 		species,
 		items,
+		megas,
 		abilities,
 		moves,
 	};
